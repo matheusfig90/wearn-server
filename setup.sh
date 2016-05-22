@@ -12,7 +12,7 @@ sudo apt-get -y install vim apache2 libapache2-mod-wsgi python-pip
 sudo pip install -r /var/www/wearn/requirements.txt
 
 # Installing MongoDB
-sudo apt-get -y mongodb
+sudo apt-get -y install mongodb
 
 # Create site in apache
 cd /etc/apache2
