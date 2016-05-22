@@ -1,3 +1,7 @@
+# Exporting envorinment variables
+echo 'export LC_ALL=en_US.UTF-8'>> ~/.bashrc
+echo 'export LANG=en_US.UTF-8'>> ~/.bashrc
+
 # Update all softwares installeds
 sudo apt-get -y update
 
@@ -6,6 +10,9 @@ sudo apt-get -y install vim apache2 libapache2-mod-wsgi python-pip
 
 # Installing all requirements projects
 sudo pip install -r /var/www/wearn/requirements.txt
+
+# Installing MongoDB
+sudo apt-get -y mongodb
 
 # Create site in apache
 cd /etc/apache2

@@ -20,6 +20,4 @@ make all -j8
 make test -j8
 echo 'export PATH="/home/vagrant/caffe/build/tools:$PATH"' >> ~/.bashrc
 echo 'export PYTHONPATH=/home/vagrant/caffe/python' >> ~/.bashrc
-echo 'export LC_ALL=en_US.UTF-8'>> ~/.bashrc
-echo 'export LANG=en_US.UTF-8'>> ~/.bashrc
 source ~/.bashrc
