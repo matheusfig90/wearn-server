@@ -1,7 +1,15 @@
-from flask import Flask
+# Dependencies
+import os
+import flask
+import caffe
 
-app = Flask(__name__)
+# Create application
+app = flask.Flask(__name__)
+app.config['UPLOAD_FOLDER'] = '/tmp' # Settings upload path
 
 @app.route('/')
 def index():
     return 'Hello World!'
+
+# Import routes
+import wearn.routes

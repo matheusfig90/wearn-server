@@ -12,5 +12,5 @@ indent_style = space
 insert_final_newline = true
 
 # 4 space indentation
-[*.{py,.conf}]
+[*.{py,conf,html}]
 indent_size = 4
