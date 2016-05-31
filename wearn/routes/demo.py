@@ -2,7 +2,7 @@
 from wearn import app, flask
 from flask import request
 from pymongo import MongoClient
-from scipy.spatial.distance import cosine, mahalanobis, jaccard
+from scipy.spatial.distance import cosine, correlation
 
 import os
 import cv2
@@ -69,12 +69,8 @@ def demo():
         # Cosine distance
         cosine_distance = cosine(feature_maps, clothing_fm)
 
-        # Jaccard
-        jaccard_distance = jaccard(feature_maps, clothing_fm)
-
-        # Mahalanobis
-        # mahalanobis_distance = mahalanobis(feature_maps, clothing_fm, np.linalg.inv(np.cov(feature_maps)))
-        mahalanobis_distance = 0
+        # Correlation distance
+        correlation_distance = correlation(feature_maps, clothing_fm)
 
         predictions.append([
             str(clothing['name']),
@@ -82,8 +78,7 @@ def demo():
             str(clothing['link']),
             euclidean_distance,
             cosine_distance,
-            jaccard_distance,
-            mahalanobis_distance
+            correlation_distance
         ])
 
     # Show best results by euclidean distance
@@ -92,10 +87,7 @@ def demo():
     # Show best results by cosine distance
     predictions_by_cosine = sorted(predictions, key=lambda x: x[4])[:10]
 
-    # Show best results by jaccard distance
-    predictions_by_jaccard = sorted(predictions, key=lambda x: x[5])[:10]
+    # Show best results by correlation distance
+    predictions_by_correlation = sorted(predictions, key=lambda x: x[5])[:10]
 
-    # Show best results by mahalanobis distance
-    predictions_by_mahalanobis = sorted(predictions, key=lambda x: x[6])[:10]
-
-    return flask.render_template('demo_results.html', predictions_by_euclidean=predictions_by_euclidean, predictions_by_cosine=predictions_by_cosine, predictions_by_jaccard=predictions_by_jaccard, predictions_by_mahalanobis=predictions_by_mahalanobis)
+    return flask.render_template('demo_results.html', predictions_by_euclidean=predictions_by_euclidean, predictions_by_cosine=predictions_by_cosine, predictions_by_correlation=predictions_by_correlation)
