@@ -1,0 +1,16 @@
+*corelação
+
+caffe vis
+t-sne
+
+pesquisar sobre medidas de similaridades para muitas dimensões
+
+
+
+==================================================
+Análise de Deep Toolbox Visualization
+==================================================
+
+i4e/5x5_r - camisetas com pessoas OK, sem pessoas NÃO
+i4e/3x3   - pega MUITO BEM o fundo
+i3b/1x1   - pega MUITO BEM mãos e braços
