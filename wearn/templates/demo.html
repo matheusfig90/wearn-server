@@ -1,19 +1,91 @@
-{% extends "demo_layout.html" %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Wearn - Demo!</title>
 
-{% block content %}
-<form class="horizontal" enctype="multipart/form-data" method="POST">
-    <div class="form-group">
-        <div class="col-md-offset-3 col-md-6">
-            <h1 class="text-center">Demo</h1>
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 
-            <label class="col-md-2 control-label">Imagem:</label>
-            <div class="col-md-8">
-                <input type="file" name="file" accept="image/*" class="form-control">
+    <!-- Javascripts -->
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="col-md-12">
+        <form id="form" class="horizontal" enctype="multipart/form-data" method="POST">
+            <div class="form-group">
+                <div class="col-md-offset-3 col-md-6">
+                    <h1 class="text-center">Demo</h1>
+
+                    <label class="col-md-2 control-label">Imagem:</label>
+                    <div class="col-md-8">
+                        <input id="file-input" type="file" name="file" accept="image/*" class="form-control">
+                    </div>
+                    <div class="col-md-2">
+                        <button id="button" type="submit" class="btn btn-primary">Pesquisar</button>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-primary">Pesquisar</button>
-            </div>
-        </div>
+        </form>
+
+        <div id="results" class="col-md-offset-3 col-md-6"></div>
     </div>
-</form>
-{% endblock %}
+
+    <script type="text/javascript">
+        var form = document.getElementById('form'),
+      fileSelect = document.getElementById('file-input'),
+      formButton = document.getElementById('button')
+
+        form.onsubmit = function(e) {
+            // Set up the request.
+            var xhr = new XMLHttpRequest();
+
+            // Create a new FormData object.
+            var formData = new FormData();
+
+            // Get file to upload
+            var files = fileSelect.files;
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+
+                formData.append('file', file, file.name);
+            }
+
+            // Open the connection
+            xhr.open('POST', '/api/v1/search', true);
+
+            // Set up a handler for when the request finishes.
+            xhr.onload = function () {
+              if (xhr.status === 200) {
+                var data = JSON.parse(xhr.responseText),
+                    html = '';
+
+                html += '<div class="row" style="height: 50px;"></div>';
+                html += '<div class="col-md-12">';
+                
+                for (i = 0; i < data.length; i++) {
+                    var item = data[i];
+
+                    html += '<div class="col-md-3">';
+                    html += ' <a href="' + item[2] + '" target="_blank">';
+                    html += '  <img src="' + item[1] + '" width="120" />';
+                    html += ' </a>';
+                    html += '</div>';
+                }
+                
+                html += '</div>';
+
+                document.getElementById('results').innerHTML = html;
+              } else {
+                alert('An error occurred!');
+              }
+            };
+
+            // Send the Data.
+            xhr.send(formData);
+
+            return false;
+        }
+    </script>
+</body>
+</html>

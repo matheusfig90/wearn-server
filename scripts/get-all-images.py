@@ -24,15 +24,15 @@ net = caffe.Net(arch, model, caffe.TEST)
 layer = 'pool5/7x7_s1'
 
 # Connect into database
-mongoClient = MongoClient('mongodb://localhost:27017/')
+mongoClient = MongoClient('mongodb://localhost:27017/wearn')
 db = mongoClient.wearn
 
 # Download all images
-for clothing in db.clothings.find({ 'feature_maps': { '$exists': False } }):
+for clothing in db.wears.find({ 'feature_maps': { '$exists': False } }):
     print 'Downloading image from: ' + str(clothing['image'])
 
     # Set image file
-    image_file = '/tmp/wearn/' + str(clothing['_id']) + '.jpg'
+    image_file = '/tmp/' + str(clothing['_id']) + '.jpg'
     
     # Save image
     urllib.urlretrieve(clothing['image'], image_file)
@@ -55,7 +55,7 @@ for clothing in db.clothings.find({ 'feature_maps': { '$exists': False } }):
     # Save feature maps in database
     clothing['feature_maps'] = pickle.dumps({ 'wearn': net.blobs[layer].data })
 
-    db.clothings.update({ 
+    db.wears.update({ 
         '_id': ObjectId(clothing['_id']) 
     }, {
         'name': clothing['name'],
