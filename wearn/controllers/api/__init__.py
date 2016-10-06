@@ -1,6 +1,9 @@
 # Dependencies
+import base64
 import cPickle as pickle
+import hashlib
 import json
+import random
 import os
 
 from flask import request
@@ -12,11 +15,13 @@ from wearn.models.wear import Wear
 def search():
 
     # Get file
-    file = request.files['file']
-    file.save(os.path.join(app.config['UPLOAD_FOLDER'], file.filename))
+    file = base64.b64decode(request.form['file'])
+    filename = os.path.join(app.config['UPLOAD_FOLDER'], hashlib.sha224(file).hexdigest()) + '.jpg'
+    with open(filename, 'wb') as f:
+        f.write(file)
 
     # Calculate predictions
-    predictions = Wear.search(file.filename)
+    predictions = Wear.search(filename)
 
     # Show best results by euclidean distance
     predictions_by_euclidean = sorted(predictions, key=lambda x: x[3])[:10]
