@@ -37,52 +37,54 @@
       formButton = document.getElementById('button')
 
         form.onsubmit = function(e) {
-            // Set up the request.
-            var xhr = new XMLHttpRequest();
+            var fileReader = new FileReader();
+            fileReader.onload = function(e) {
+                // Set up the request.
+                var xhr = new XMLHttpRequest();
 
-            // Create a new FormData object.
-            var formData = new FormData();
+                // Create a new FormData object.
+                var formData = new FormData();
+                formData.append('file', e.target.result);
+
+                // Open the connection
+                xhr.open('POST', '/api/v1/search', true);
+
+                // Set up a handler for when the request finishes.
+                xhr.onload = function () {
+                  if (xhr.status === 200) {
+                    var data = JSON.parse(xhr.responseText),
+                        html = '';
+
+                    html += '<div class="row" style="height: 50px;"></div>';
+                    html += '<div class="col-md-12">';
+                    
+                    for (i = 0; i < data.length; i++) {
+                        var item = data[i];
+
+                        html += '<div class="col-md-3">';
+                        html += ' <a href="' + item[2] + '" target="_blank">';
+                        html += '  <img src="' + item[1] + '" width="120" />';
+                        html += ' </a>';
+                        html += '</div>';
+                    }
+                    
+                    html += '</div>';
+
+                    document.getElementById('results').innerHTML = html;
+                  } else {
+                    alert('An error occurred!');
+                  }
+                };
+
+                // Send the Data.
+                xhr.send(formData);
+            };
 
             // Get file to upload
             var files = fileSelect.files;
             for (var i = 0; i < files.length; i++) {
-                var file = files[i];
-
-                formData.append('file', file, file.name);
+                fileReader.readAsDataURL(files[i]);
             }
-
-            // Open the connection
-            xhr.open('POST', '/api/v1/search', true);
-
-            // Set up a handler for when the request finishes.
-            xhr.onload = function () {
-              if (xhr.status === 200) {
-                var data = JSON.parse(xhr.responseText),
-                    html = '';
-
-                html += '<div class="row" style="height: 50px;"></div>';
-                html += '<div class="col-md-12">';
-                
-                for (i = 0; i < data.length; i++) {
-                    var item = data[i];
-
-                    html += '<div class="col-md-3">';
-                    html += ' <a href="' + item[2] + '" target="_blank">';
-                    html += '  <img src="' + item[1] + '" width="120" />';
-                    html += ' </a>';
-                    html += '</div>';
-                }
-                
-                html += '</div>';
-
-                document.getElementById('results').innerHTML = html;
-              } else {
-                alert('An error occurred!');
-              }
-            };
-
-            // Send the Data.
-            xhr.send(formData);
 
             return false;
         }

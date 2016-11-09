@@ -21,7 +21,7 @@ def search():
         f.write(file)
 
     # Calculate predictions
-    predictions = Wear.search(filename)
+    predictions = Wear.search(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
     # Show best results by euclidean distance
     predictions_by_euclidean = sorted(predictions, key=lambda x: x[3])[:10]

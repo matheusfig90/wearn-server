@@ -6,31 +6,93 @@ import numpy as np
 import os
 import random
 import urllib
+import matplotlib.image as mpimage
 
+from PIL import Image
 from scipy.spatial.distance import cosine, correlation
 from wearn import app
 from wearn.models.database import Database
 
 # Get current path
-path = os.path.dirname(os.path.abspath(__file__)) + '/../.env'
+current_path = os.path.dirname(os.path.abspath(__file__)) + '/../../'
 
-# Set caffe to run in GPU mode
-caffe.set_mode_cpu()
+# Set caffe to run in GPU mode, otherwise run in CPU mode
+if app.config['GPU_MODE'] == True:
+    caffe.set_mode_gpu()
+else:
+    caffe.set_mode_cpu()
 
 """
     Class to save and search wears.
 """
 class Wear(object):
 
-    # Set model and architecture to neural network
-    arch  = os.path.dirname(os.path.abspath(__file__)) + '/../../caffe/deploy.prototxt'
-    model = os.path.dirname(os.path.abspath(__file__)) + '/../../caffe/bvlc_googlenet.caffemodel'
+    # Set googlenet model and architecture
+    googlenet_arch  = current_path + 'networks/bvlc_googlenet.deploy.prototxt'
+    googlenet_model = current_path + 'networks/bvlc_googlenet.caffemodel'
 
-    # Set caffe network
-    net = caffe.Net(arch, model, caffe.TEST)
+    # Set fcn model and architecture
+    fcn_arch  = current_path + 'networks/fcn-8s.deploy.prototxt'
+    fcn_model = current_path + 'networks/fcn-8s.caffemodel'
 
-    # Set net layer
-    layer = 'pool5/7x7_s1'
+    # Set googlenet layer
+    googlenet_layer = 'pool5/7x7_s1'
+
+    """
+        Get feature maps from image
+
+        Returns array
+    """
+    @staticmethod
+    def get_feature_maps(image):
+        # Initialize googlenet network
+        googlenet = caffe.Net(Wear.googlenet_arch, Wear.googlenet_model, caffe.TEST)
+
+        # Initialize FCN network
+        fcn = caffe.Net(Wear.fcn_arch, Wear.fcn_model, caffe.TEST)
+
+        # Read image and convert to array
+        image_matrix = Image.open(image)
+        image_matrix = np.array(image_matrix, dtype=np.float32)
+
+        # Save original image in image_base variable
+        image_base = image_matrix.copy().astype(np.uint8)
+
+        # Prepare image matrix to FCN
+        image_matrix = image_matrix[:, :, ::-1]
+        image_matrix -= np.array((104.00698793, 116.66876762, 122.67891434))
+        image_matrix = image_matrix.transpose((2, 0, 1))
+
+        # Send image matrix to FCN
+        fcn.blobs['data'].reshape(1, *image_matrix.shape)
+        fcn.blobs["data"].data[...] = image_matrix
+
+        # Forward in network
+        fcn.forward()
+
+        # Get output by FCN
+        output = fcn.blobs['score'].data[0].argmax(axis=0)
+
+        # Normalize output
+        output[output != 0] = 1
+        output[output == 0] = 0
+
+        # Merge image to remove background
+        image_matrix = image_base * np.asarray(np.dstack((output, output, output)))
+        image_matrix = np.asarray(image_matrix, dtype=np.float32)
+        image_matrix = cv2.resize(image_matrix, (224, 224))
+        image_matrix = image_matrix.transpose([2, 0, 1])
+
+        # Resize image
+        googlenet.blobs["data"].reshape(1, 3, 224, 224)
+
+        # Send image to googlenet network
+        googlenet.blobs["data"].data[...] = image_matrix
+
+        # Forward in network
+        googlenet.forward()
+
+        return googlenet.blobs[Wear.googlenet_layer].data
 
     """
         Search wears by image.
@@ -39,26 +101,8 @@ class Wear(object):
     """
     @staticmethod
     def search(image):
-        # Set caffe network
-        net = caffe.Net(Wear.arch, Wear.model, caffe.TEST)
-
-        # Read image
-        image_matrix = cv2.imread(os.path.join(app.config['UPLOAD_FOLDER'], image))
-        image_matrix = cv2.resize(image_matrix, (224, 224)) # Resize image to 224x224
-        image_matrix = image_matrix[:, :, ::-1] # Convert BGR to RGB
-
-        image_data = image_matrix.astype(np.float32)
-
-        # Resize image
-        net.blobs["data"].reshape(1, 3, 224, 224)
-
-        image_data = image_data.transpose([2, 0, 1]) # Change channel
-
-        net.blobs["data"].data[...] = image_data
-        net.forward()
-
         # Get feature maps from image
-        feature_maps = net.blobs[Wear.layer].data
+        feature_maps = Wear.get_feature_maps(image)
 
         # Searching in database
         wears = Database.connect().wears.find({})
@@ -81,7 +125,7 @@ class Wear(object):
             # Correlation distance
             correlation_distance = correlation(feature_maps, wear_fm)
 
-            predictions.append([str(wear['name']), str(wear['image']), str(wear['link']), euclidean_distance])
+            predictions.append([str(wear['image']), str(wear['link']), euclidean_distance])
 
         return predictions
 
@@ -99,23 +143,8 @@ class Wear(object):
         image_file = '/tmp/' + str(random.randint(1,999999)) + '.jpg'
         urllib.urlretrieve(args['image'], image_file)
 
-        # Read image and convert to matrix
-        image_matrix = cv2.imread(image_file)
-        image_matrix = cv2.resize(image_matrix, (224, 224)) # Resize image to 224x224
-        image_matrix = image_matrix[:, :, ::-1] # Convert BGR to RGB
-
-        image_data = image_matrix.astype(np.float32)
-
-        # Resize image
-        Wear.net.blobs["data"].reshape(1, 3, 224, 224)
-
-        image_data = image_data.transpose([2, 0, 1])
-
-        Wear.net.blobs["data"].data[...] = image_data
-        Wear.net.forward()
-
-        # Serialize feature maps to save in database
-        feature_maps = pickle.dumps({ '_feature_maps': Wear.net.blobs[Wear.layer].data })
+        # Get searialize feature maps
+        feature_maps = pickle.dumps({ '_feature_maps': Wear.get_feature_maps(image_file) })
 
         return Database.connect().wears.insert_one({ 
             'name': args['name'],
