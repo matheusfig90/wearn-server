@@ -35,6 +35,12 @@ class Wear(object):
     fcn_arch  = current_path + 'networks/fcn-8s.deploy.prototxt'
     fcn_model = current_path + 'networks/fcn-8s.caffemodel'
 
+    # Initialize googlenet network
+    googlenet = caffe.Net(googlenet_arch, googlenet_model, caffe.TEST)
+
+    # Initialize FCN network
+    fcn = caffe.Net(fcn_arch, fcn_model, caffe.TEST)
+
     # Set googlenet layer
     googlenet_layer = 'pool5/7x7_s1'
 
@@ -45,12 +51,6 @@ class Wear(object):
     """
     @staticmethod
     def get_feature_maps(image):
-        # Initialize googlenet network
-        googlenet = caffe.Net(Wear.googlenet_arch, Wear.googlenet_model, caffe.TEST)
-
-        # Initialize FCN network
-        fcn = caffe.Net(Wear.fcn_arch, Wear.fcn_model, caffe.TEST)
-
         # Read image and convert to array
         image_matrix = Image.open(image)
         image_matrix = np.array(image_matrix, dtype=np.float32)
@@ -64,14 +64,14 @@ class Wear(object):
         image_matrix = image_matrix.transpose((2, 0, 1))
 
         # Send image matrix to FCN
-        fcn.blobs['data'].reshape(1, *image_matrix.shape)
-        fcn.blobs["data"].data[...] = image_matrix
+        Wear.fcn.blobs['data'].reshape(1, *image_matrix.shape)
+        Wear.fcn.blobs["data"].data[...] = image_matrix
 
         # Forward in network
-        fcn.forward()
+        Wear.fcn.forward()
 
         # Get output by FCN
-        output = fcn.blobs['score'].data[0].argmax(axis=0)
+        output = Wear.fcn.blobs['score'].data[0].argmax(axis=0)
 
         # Normalize output
         output[output != 0] = 1
@@ -84,15 +84,15 @@ class Wear(object):
         image_matrix = image_matrix.transpose([2, 0, 1])
 
         # Resize image
-        googlenet.blobs["data"].reshape(1, 3, 224, 224)
+        Wear.googlenet.blobs["data"].reshape(1, 3, 224, 224)
 
         # Send image to googlenet network
-        googlenet.blobs["data"].data[...] = image_matrix
+        Wear.googlenet.blobs["data"].data[...] = image_matrix
 
         # Forward in network
-        googlenet.forward()
+        Wear.googlenet.forward()
 
-        return googlenet.blobs[Wear.googlenet_layer].data
+        return Wear.googlenet.blobs[Wear.googlenet_layer].data
 
     """
         Search wears by image.

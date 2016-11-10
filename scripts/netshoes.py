@@ -26,7 +26,12 @@ for url in urls:
         soup = BeautifulSoup(urllib2.urlopen(currentUrl))
 
         # Get all images
-        for item in soup.select('.product-list-item'):
+        items = soup.select('.product-list-item')
+        if len(items) == 0:
+            break
+
+        # Get all images
+        for item in items:
             try:
                 # Get image
                 image_link = item.select('.product-img')[0].select('img')[0].attrs.get('data-src')
@@ -40,7 +45,7 @@ for url in urls:
                 })
             except:
                 pass
-    
+
         if len(soup.select('.pagination-link.is-next')) == 0:
             break
 
