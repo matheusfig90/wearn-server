@@ -1,6 +1,6 @@
 Cheetah==2.4.4
 Cython==0.24
-Flask==0.10.1
+Flask==1.0
 Flask-SQLAlchemy==2.1
 Jinja2==2.8
 Markdown==2.6.6
@@ -84,7 +84,7 @@ wsgiref==0.1.2
 zope.interface==4.0.5
 Cheetah==2.4.4
 Cython==0.24
-Flask==0.10.1
+Flask==1.0
 Flask-SQLAlchemy==2.1
 Jinja2==2.8
 Markdown==2.6.6
