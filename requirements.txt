@@ -21,7 +21,7 @@ colorama==0.2.5
 configobj==4.7.2
 cssselect==0.9.1
 cycler==0.10.0
-dask==0.9.0
+dask==2021.10.0
 decorator==4.0.9
 h5py==2.6.0
 html5lib==0.999
@@ -112,7 +112,7 @@ command-not-found==0.3
 configobj==4.7.2
 cssselect==0.9.1
 cycler==0.10.0
-dask==0.9.0
+dask==2021.10.0
 debtagshw==0.1
 decorator==4.0.9
 defer==1.0.6
