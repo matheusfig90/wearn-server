@@ -90,7 +90,7 @@ Jinja2==2.8
 Markdown==2.6.6
 MarkupSafe==0.23
 PAM==0.4.2
-Pillow==2.3.0
+Pillow==9.0.0
 PyDispatcher==2.0.5
 PyYAML==3.10
 Pygments==2.1.3
