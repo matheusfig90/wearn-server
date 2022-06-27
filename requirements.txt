@@ -171,7 +171,7 @@ python-gflags==3.0.5
 pytz==2016.4
 pyxdg==0.25
 queuelib==1.4.2
-reportlab==3.0
+reportlab==3.5.55
 requests==2.2.1
 scikit-image==0.12.3
 scipy==0.17.1
