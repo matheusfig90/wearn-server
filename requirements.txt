@@ -24,7 +24,7 @@ cycler==0.10.0
 dask==0.9.0
 decorator==4.0.9
 h5py==2.6.0
-html5lib==0.999
+html5lib==0.999999999
 httplib2==0.8
 ipython==4.2.0
 ipython-genutils==0.1.0
@@ -120,7 +120,7 @@ dirspec==13.10
 duplicity==0.6.23
 enum34==1.1.6
 h5py==2.6.0
-html5lib==0.999
+html5lib==0.999999999
 httplib2==0.8
 ipython==4.2.0
 ipython-genutils==0.1.0
