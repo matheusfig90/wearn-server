@@ -65,7 +65,7 @@ python-debian==0.1.21-nmu2ubuntu2
 python-gflags==3.0.5
 pytz==2016.4
 queuelib==1.4.2
-requests==2.2.1
+requests==2.20.0
 scikit-image==0.12.3
 scipy==0.17.1
 service-identity==16.0.0
@@ -172,7 +172,7 @@ pytz==2016.4
 pyxdg==0.25
 queuelib==1.4.2
 reportlab==3.0
-requests==2.2.1
+requests==2.20.0
 scikit-image==0.12.3
 scipy==0.17.1
 service-identity==16.0.0
