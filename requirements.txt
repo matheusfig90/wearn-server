@@ -48,7 +48,7 @@ pbr==1.9.1
 pexpect==4.0.1
 pickleshare==0.7.2
 prettytable==0.7.2
-protobuf==2.6.1
+protobuf==3.18.3
 ptyprocess==0.5.1
 pyOpenSSL==0.13
 pyasn1==0.1.9
@@ -151,7 +151,7 @@ pickleshare==0.7.2
 piston-mini-client==0.7.5
 prettytable==0.7.2
 prompt-toolkit==1.0.7
-protobuf==2.6.1
+protobuf==3.18.3
 ptyprocess==0.5.1
 pyOpenSSL==0.13
 pyasn1==0.1.9
